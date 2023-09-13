@@ -113,5 +113,20 @@ alias dbuild='docker build -t'
 alias drun='docker run --rm -it --name toolset -v $HOME:$HOME'
 alias rfor='repo forall -p'
 alias ggrep='grep -rnw . -e'
+alias prettyjson="python -m json.tool"
+alias pj="prettyjson"
 
-curl wttr.in/TLS
+get_token() {
+	echo -n 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiTUlDUk9XQVZFTE9SRCIsInZlcnNpb24iOiJ2MiIsInJlc2V0X2RhdGUiOiIyMDIzLTA5LTA5IiwiaWF0IjoxNjk0NTkxMTM3LCJzdWIiOiJhZ2VudC10b2tlbiJ9.r    yBWO8tmGzaf9pOnXLduB1hBr5PvHQxWmHr32crIiEsERkdNP6gMgJCBQKgx7dKf874V3fyeuHoBrXg8ADiCEKdbGsRNATcyHCydqo5LOTLd-yE9bHC5yTJtsUQz1ar2JiK3qPeckdO-yXmhIF9_9b8nrOmB8dpyFlr_iAmAR_GKy3rGZ_po7cpgCDMgeF4rdMH1eN6FBia16TBb    NWPQteaTLRSxrXGYNIFzcbCeup0S6KHJXkR3kOJ5Yrj063qT9Hdf8YzV9WkPn1lWmVyeNxxb_IJcRzUCR5miyZUX3iVYsJrNPQbgOyi819dyZu75fVrOqWAvIFYKr83vA6x5Bw'
+}
+
+alias sp_info="curl 'https://api.spacetraders.io/v2/my/agent' --header 'Authorization: Bearer '`sp_token`"
+alias sp_cont="curl 'https://api.spacetraders.io/v2/my/contracts' --header 'Authorization: Bearer '`sp_token`"
+alias sp_wp="./sp_wp.sh"
+alias sp_cont_acc="./sp_cont_acc.sh"
+
+#curl wttr.in/TLS
+
+# Add JBang to environment
+alias j!=jbang
+export PATH="$HOME/.jbang/bin:$PATH"
