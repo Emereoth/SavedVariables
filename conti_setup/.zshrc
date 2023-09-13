@@ -148,7 +148,7 @@ function sp_show_wp_spec() { #get location info, type-specific; $1=sector-system
 }
 
 function sp_show_all_wp() { #show all wps in system
-	curl "https://api.spacetraders.io/v2/systems/$1/waypoints" --header 'Authorization: Bearer '`get_token` 
+	curl "https://api.spacetraders.io/v2/systems/$1/waypoints" --header 'Authorization: Bearer '`get_token`
 }
 
 function sp_list_fleet() { #lists all ships
@@ -164,9 +164,22 @@ function sp_buy_ship() { #buy ship at shipyard. $1=ship type, $2=shipyard wp
 	--header 'Content-Type: application/json'
 }
 
+function sp_cargo_sell() { #sell cargo to market; $1=ship, $2=tradeSymbol, $3=nbUnits
+	curl -d "{
+	\"symbol\":\"$2\",
+	\"units\":\"$3\"
+	}" --request POST --url "https://api.spacetraders.io/v2/my/ships/$1/sell" --header 'Authorization: Bearer '`get_token` \
+	--header 'Content-Type: application/json'
+}
+
+function sp_cargo_show() { #lists ship cargo, $1=ship
+	curl "https://api.spacetraders.io/v2/my/ships/$1/cargo" --header 'Authorization: Bearer '`get_token`
+}
+
 ################	CONTRACTS
 function sp_list_cont() { #list contracts
 	curl "https://api.spacetraders.io/v2/my/contracts" --header 'Authorization: Bearer '`get_token`
+}
 
 function sp_get_cont() { #get contract details, $1=contractId
 	curl "https://api.spacetraders.io/v2/my/contracts/$1" --header 'Authorization: Bearer '`get_token`
@@ -194,6 +207,14 @@ function sp_orbit() { #put ship in orbit, $1=ship
 	curl -d "" --request POST --url "https://api.spacetraders.io/v2/my/ships/$1/orbit" --header 'Authorization: Bearer '`get_token`
 }
 
+function sp_dock() { #dock ship at current wp, $1=ship 
+	curl -d "" --request POST --url "https://api.spacetraders.io/v2/my/ships/$1/dock" --header 'Authorization: Bearer '`get_token`
+}
+
+function sp_refuel() { #refuel ship, $1=ship
+	curl -d "" --request POST --url "https://api.spacetraders.io/v2/my/ships/$1/refuel" --header 'Authorization: Bearer '`get_token`
+}
+
 function sp_nav() { #navigate to point, $1=ship symbol, $2=target wp
 	curl -d "{
 	\"waypointSymbol\":\"$2\"
@@ -201,6 +222,10 @@ function sp_nav() { #navigate to point, $1=ship symbol, $2=target wp
 	--header 'Content-Type: application/json'
 }
 
+###############		ACTIONS
+function sp_extract() { #mine from asteroid field, $1=ship
+	curl -d "" --request POST --url "https://api.spacetraders.io/v2/my/ships/$1/extract" --header 'Authorization: Bearer '`get_token`
+}
 
 #curl wttr.in/TLS
 
