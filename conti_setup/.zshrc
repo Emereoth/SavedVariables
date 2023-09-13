@@ -116,14 +116,91 @@ alias ggrep='grep -rnw . -e'
 alias prettyjson="python -m json.tool"
 alias pj="prettyjson"
 
-get_token() {
-	echo -n 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiTUlDUk9XQVZFTE9SRCIsInZlcnNpb24iOiJ2MiIsInJlc2V0X2RhdGUiOiIyMDIzLTA5LTA5IiwiaWF0IjoxNjk0NTkxMTM3LCJzdWIiOiJhZ2VudC10b2tlbiJ9.r    yBWO8tmGzaf9pOnXLduB1hBr5PvHQxWmHr32crIiEsERkdNP6gMgJCBQKgx7dKf874V3fyeuHoBrXg8ADiCEKdbGsRNATcyHCydqo5LOTLd-yE9bHC5yTJtsUQz1ar2JiK3qPeckdO-yXmhIF9_9b8nrOmB8dpyFlr_iAmAR_GKy3rGZ_po7cpgCDMgeF4rdMH1eN6FBia16TBb    NWPQteaTLRSxrXGYNIFzcbCeup0S6KHJXkR3kOJ5Yrj063qT9Hdf8YzV9WkPn1lWmVyeNxxb_IJcRzUCR5miyZUX3iVYsJrNPQbgOyi819dyZu75fVrOqWAvIFYKr83vA6x5Bw'
+
+#################	BASICS
+function get_token() {
+	echo -n 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiTUlDUk9XQVZFTE9SRCIsInZlcnNpb24iOiJ2MiIsInJlc2V0X2RhdGUiOiIyMDIzLTA5LTA5IiwiaWF0IjoxNjk0NTkxMTM3LCJzdWIiOiJhZ2VudC10b2tlbiJ9.ryBWO8tmGzaf9pOnXLduB1hBr5PvHQxWmHr32crIiEsERkdNP6gMgJCBQKgx7dKf874V3fyeuHoBrXg8ADiCEKdbGsRNATcyHCydqo5LOTLd-yE9bHC5yTJtsUQz1ar2JiK3qPeckdO-yXmhIF9_9b8nrOmB8dpyFlr_iAmAR_GKy3rGZ_po7cpgCDMgeF4rdMH1eN6FBia16TBbNWPQteaTLRSxrXGYNIFzcbCeup0S6KHJXkR3kOJ5Yrj063qT9Hdf8YzV9WkPn1lWmVyeNxxb_IJcRzUCR5miyZUX3iVYsJrNPQbgOyi819dyZu75fVrOqWAvIFYKr83vA6x5Bw'
 }
 
-alias sp_info="curl 'https://api.spacetraders.io/v2/my/agent' --header 'Authorization: Bearer '`sp_token`"
-alias sp_cont="curl 'https://api.spacetraders.io/v2/my/contracts' --header 'Authorization: Bearer '`sp_token`"
-alias sp_wp="./sp_wp.sh"
-alias sp_cont_acc="./sp_cont_acc.sh"
+#function sp_auth() { #add auth to request
+#	echo -n "--header Authorization: Bearer `get_token`'"
+#}
+
+function log_and_delete() { #write prettyjson to log, open it and deleter it afterwards
+	pj > log && vim log && rm log
+}
+alias lad="log_and_delete"
+
+function sp_info() { #get agent info
+	curl "https://api.spacetraders.io/v2/my/agent" --header 'Authorization: Bearer '`get_token`
+}
+
+function sp_show_systems() { #list all systems
+	curl "https://api.spacetraders.io/v2/systems" --header 'Authorization: Bearer '`get_token`
+}
+
+function sp_show_wp() { #get location info, $1=sector-system, $2=sector-system-waypoint
+	curl "https://api.spacetraders.io/v2/systems/$1/waypoints/$2" --header 'Authorization: Bearer '`get_token`
+}
+
+function sp_show_wp_spec() { #get location info, type-specific; $1=sector-system, $2=sector-system-wp, $3=wp-type ('shipyard', 'market', 'jump-gate')
+	curl "https://api.spacetraders.io/v2/systems/$1/waypoints/$2/$3" --header 'Authorization: Bearer '`get_token`
+}
+
+function sp_show_all_wp() { #show all wps in system
+	curl "https://api.spacetraders.io/v2/systems/$1/waypoints" --header 'Authorization: Bearer '`get_token` 
+}
+
+function sp_list_fleet() { #lists all ships
+	curl "https://api.spacetraders.io/v2/my/ships" --header 'Authorization: Bearer '`get_token`
+}
+
+################	BUY/SELL
+function sp_buy_ship() { #buy ship at shipyard. $1=ship type, $2=shipyard wp
+	curl -d "{
+	\"shipType\":\"$1\",
+	\"waypointSymbol\":\"$2\"
+	}" --request POST --url "https://api.spacetraders.io/v2/my/ships" --header 'Authorization: Bearer '`get_token` \
+	--header 'Content-Type: application/json'
+}
+
+################	CONTRACTS
+function sp_list_cont() { #list contracts
+	curl "https://api.spacetraders.io/v2/my/contracts" --header 'Authorization: Bearer '`get_token`
+
+function sp_get_cont() { #get contract details, $1=contractId
+	curl "https://api.spacetraders.io/v2/my/contracts/$1" --header 'Authorization: Bearer '`get_token`
+}
+
+function sp_cont_acc() { # accept contract, $1=contractId
+	curl -d "" --request POST --url "https://api.spacetraders.io/v2/my/contracts/$1/accept" --header 'Authorization: Bearer '`get_token`
+}
+
+function sp_cont_deliver() { # deliver cargo to contract, $1=contractId, $2=shipSymbol, $3=tradeSymbol, $4=nbUnits
+	curl -d "{
+	\"shipSymbol\":\"$2\",
+	\"tradeSymbol\":\"$3\",
+	\"units\":\"$4\"
+	}" --request POST --url "https://api.spacetraders.io/v2/my/ships/$1/navigate" --header 'Authorization: Bearer '`get_token` \
+	--header 'Content-Type: application/json'
+}
+
+function sp_cont_fulfill() { # finalize contract, $1=contractId
+	curl -d "" --request POST --url "https://api.spacetraders.io/v2/my/contracts/$1/fulfill" --header 'Authorization: Bearer '`get_token`
+}
+
+###############		MOVEMENT
+function sp_orbit() { #put ship in orbit, $1=ship 
+	curl -d "" --request POST --url "https://api.spacetraders.io/v2/my/ships/$1/orbit" --header 'Authorization: Bearer '`get_token`
+}
+
+function sp_nav() { #navigate to point, $1=ship symbol, $2=target wp
+	curl -d "{
+	\"waypointSymbol\":\"$2\"
+	}" --request POST --url "https://api.spacetraders.io/v2/my/ships/$1/navigate" --header 'Authorization: Bearer '`get_token` \
+	--header 'Content-Type: application/json'
+}
+
 
 #curl wttr.in/TLS
 
