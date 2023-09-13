@@ -21,4 +21,4 @@ if [[ "$SYS_DONE" == 0 || "$WP_DONE" == 0 ]]; then
 	exit 1
 fi
 
-curl https://api.spacetraders.io/v2/systems/$SYSTEM/waypoints/$WAYPOINT
+curl "https://api.spacetraders.io/v2/systems/$SYSTEM/waypoints/$WAYPOINT" --header 'Authorization: Bearer '`get_token`
